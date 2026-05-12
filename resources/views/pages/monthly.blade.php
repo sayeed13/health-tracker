@@ -57,7 +57,9 @@
             <span class="w-3 h-3 rounded-full bg-red-500"></span>
             ঔষধ
         </h3>
-        <canvas id="medicineChart" height="200"></canvas>
+        <div class="relative h-40 sm:h-56 md:h-64 mb-4">
+            <canvas id="medicineChart"></canvas>
+        </div>
     </div>
 
     {{-- নামাজ Chart --}}
@@ -66,7 +68,9 @@
             <span class="w-3 h-3 rounded-full bg-purple-500"></span>
             নামাজ
         </h3>
-        <canvas id="prayerChart" height="200"></canvas>
+        <div class="relative h-40 sm:h-56 md:h-64 mb-4">
+            <canvas id="prayerChart"></canvas>
+        </div>
     </div>
 
     {{-- ব্যায়াম Chart --}}
@@ -75,7 +79,9 @@
             <span class="w-3 h-3 rounded-full bg-blue-500"></span>
             ব্যায়াম
         </h3>
-        <canvas id="exerciseChart" height="200"></canvas>
+        <div class="relative h-40 sm:h-56 md:h-64 mb-4">
+            <canvas id="exerciseChart"></canvas>
+        </div>
     </div>
 
     {{-- ধূমপান Chart --}}
@@ -84,7 +90,9 @@
             <span class="w-3 h-3 rounded-full bg-amber-500"></span>
             ধূমপান
         </h3>
-        <canvas id="smokingChart" height="200"></canvas>
+        <div class="relative h-40 sm:h-56 md:h-64 mb-4">
+            <canvas id="smokingChart"></canvas>
+        </div>
     </div>
 
 </div>
@@ -187,6 +195,7 @@ function renderCharts(data) {
                 },
                 y: {
                     beginAtZero: true,
+                    suggestedMax: 5,
                     grid: { color: '#374151' },
                     ticks: {
                         color: '#9ca3af',
@@ -228,17 +237,24 @@ function setFilter(filter) {
         currentMonth = new Date().getMonth() + 1;
     }
 
-    // Update button styles
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        const isActive = btn.dataset.filter === filter;
-        btn.className = `filter-btn flex-1 py-2.5 rounded-xl text-sm font-semibold transition ${
-            isActive
-                ? 'bg-emerald-500 text-white active'
-                : 'bg-gray-800 border border-gray-700 text-gray-400'
-        }`;
-    });
+    // বাটনের স্টাইল আপডেট করার লজিক
+    updateButtonStyles();
 
     loadStats();
+}
+
+function updateButtonStyles() {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const isActive = btn.dataset.filter === currentFilter;
+        
+        if (isActive) {
+            // একটিভ বাটনের স্টাইল
+            btn.className = "filter-btn flex-1 py-2.5 rounded-xl text-sm font-semibold transition bg-emerald-500 text-white shadow-lg shadow-emerald-500/20";
+        } else {
+            // ইন-একটিভ বা সাধারণ বাটনের স্টাইল
+            btn.className = "filter-btn flex-1 py-2.5 rounded-xl text-sm font-semibold transition bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700";
+        }
+    });
 }
 
 function changeMonth(direction) {
@@ -256,7 +272,7 @@ function changeMonth(direction) {
 }
 
 // Initial load
-loadStats();
+setFilter('week');
 </script>
 
 </x-app-layout>
