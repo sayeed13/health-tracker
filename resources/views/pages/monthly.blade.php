@@ -161,51 +161,82 @@ function renderCharts(data) {
     });
 
     // Create new charts
-    const chartConfig = (categoryKey) => ({
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: chart_data[categoryKey].label,
-                data: chart_data[categoryKey].data,
-                backgroundColor: chart_data[categoryKey].color,
-                borderRadius: 6,
-                barThickness: currentFilter === 'month' ? 8 : 20,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#1f2937',
-                    titleColor: '#fff',
-                    bodyColor: '#d1d5db',
-                    borderColor: '#374151',
-                    borderWidth: 1,
-                    padding: 10,
-                    displayColors: false,
-                }
+    const chartConfig = (categoryKey) => {
+        const values = chart_data[categoryKey].data;
+        const maxValue = Math.max(...values, 0);
+
+        const yStepSize = categoryKey === 'exercise'
+            ? (maxValue > 50 ? 10 : maxValue > 20 ? 5 : 1)
+            : 1;
+
+        const suggestedMax = categoryKey === 'exercise'
+            ? Math.max(10, Math.ceil(maxValue / yStepSize) * yStepSize)
+            : Math.max(5, maxValue + 1);
+
+        return {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: chart_data[categoryKey].label,
+                    data: values,
+                    backgroundColor: chart_data[categoryKey].color,
+                    borderRadius: 6,
+                    barThickness: currentFilter === 'month' ? 8 : 20,
+                    categoryKey: categoryKey,
+                }]
             },
-            scales: {
-                x: {
-                    grid: { display: false, color: '#374151' },
-                    ticks: { color: '#9ca3af', font: { size: 11 } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1f2937',
+                        titleColor: '#fff',
+                        bodyColor: '#d1d5db',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                const key = context.dataset.categoryKey;
+                                const value = context.raw ?? 0;
+
+                                if (key === 'exercise') {
+                                    return `পুশ-আপ: ${value}`;
+                                }
+
+                                if (key === 'smoking') {
+                                    return `সিগারেট: ${value}`;
+                                }
+
+                                return `${context.dataset.label}: ${value}`;
+                            }
+                        }
+                    }
                 },
-                y: {
-                    beginAtZero: true,
-                    suggestedMax: 5,
-                    grid: { color: '#374151' },
-                    ticks: {
-                        color: '#9ca3af',
-                        font: { size: 11 },
-                        stepSize: 1
+                scales: {
+                    x: {
+                        grid: { display: false, color: '#374151' },
+                        ticks: { color: '#9ca3af', font: { size: 11 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: suggestedMax,
+                        grid: { color: '#374151' },
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { size: 11 },
+                            stepSize: yStepSize,
+                            precision: 0
+                        }
                     }
                 }
             }
-        }
-    });
+        };
+    };
 
     charts.medicine = new Chart(
         document.getElementById('medicineChart').getContext('2d'),

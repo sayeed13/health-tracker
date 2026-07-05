@@ -47,17 +47,46 @@
         :isSmokingPage="true" 
     />
 
+    <form method="POST" action="{{ route('smoking.extra.save') }}" class="bg-gray-900 border border-gray-800 rounded-xl p-4 mt-4 space-y-4">
+        @csrf
+    
+        <div>
+            <label for="extra_cigarettes" class="block text-sm font-medium text-white mb-2">
+                আজ এক্সট্রা কতটি সিগারেট খেয়েছেন?
+            </label>
+            <input
+                id="extra_cigarettes"
+                type="number"
+                name="extra_cigarettes"
+                min="0"
+                step="1"
+                value="{{ old('extra_cigarettes', $extraCigarettes ?? 0) }}"
+                class="w-full rounded-xl bg-gray-950 border border-gray-700 text-white px-4 py-3"
+                placeholder="যেমন 1 / 2 / 3"
+            >
+            @error('extra_cigarettes')
+                <p class="text-xs text-red-400 mt-2">{{ $message }}</p>
+            @enderror
+        </div>
+    
+        <button type="submit" class="w-full rounded-xl bg-amber-600 hover:bg-amber-500 text-white py-3 text-sm font-medium transition">
+            এক্সট্রা সেভ করুন
+        </button>
+    </form>
+
     {{-- আজকের সারসংক্ষেপ --}}
     @php
         $smokedCount = $logs->filter()->count();
+        $extraCount  = $extraCigarettes ?? 0;
         $total       = $tasks->count();
         $avoided     = $total - $smokedCount;
+        $totalSmoked = $smokedCount + $extraCount;
     @endphp
 
     <div class="grid grid-cols-2 gap-3 mt-4">
         <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
-            <div class="text-2xl font-bold text-red-400">{{ $smokedCount }}</div>
-            <div class="text-xs text-gray-500 mt-1">আজ খেয়েছি</div>
+            <div class="text-2xl font-bold text-red-400">{{ $totalSmoked }}</div>
+            <div class="text-xs text-gray-500 mt-1">আজ মোট খেয়েছি</div>
         </div>
         <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
             <div class="text-2xl font-bold text-emerald-400">{{ $avoided }}</div>

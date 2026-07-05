@@ -28,11 +28,12 @@ Route::middleware('auth')->group(function () {
 
     // ব্যায়াম
     Route::get('/exercise', [ExerciseController::class, 'index'])->name('exercise.index');
-    Route::post('/exercise/{id}/toggle', [ExerciseController::class, 'toggle'])->name('exercise.toggle');
+    Route::post('/exercise/save', [ExerciseController::class, 'save'])->name('exercise.save');
 
     // ধূমপান
     Route::get('/smoking', [SmokingController::class, 'index'])->name('smoking.index');
     Route::post('/smoking/{id}/toggle', [SmokingController::class, 'toggle'])->name('smoking.toggle');
+    Route::post('/smoking/extra-save', [SmokingController::class, 'saveExtra'])->name('smoking.extra.save');
 
     // মাসিক
     Route::get('/monthly', [MonthlyController::class, 'index'])->name('monthly.index');

@@ -19,22 +19,6 @@ class TaskDefinitionSeeder extends Seeder
         $tasks = [
 
             // ============================================
-            // সকাল — ঘুম থেকে উঠা
-            // ============================================
-            [
-                'category'       => 'water',
-                'title'          => 'ঘুম থেকে উঠুন',
-                'description'    => 'এক গ্লাস কুসুম গরম পানি পান করুন',
-                'scheduled_time' => '08:00:00',
-                'repeat_type'    => 'daily',
-                'repeat_days'    => null,
-                'active_from_day'=> 0,
-                'active_until_day'=> null,
-                'sort_order'     => 1,
-                'is_active'      => true,
-            ],
-
-            // ============================================
             // নামাজ
             // ============================================
             [
@@ -115,35 +99,10 @@ class TaskDefinitionSeeder extends Seeder
             // ============================================
             [
                 'category'       => 'exercise',
-                'title'          => 'কার্ডিও — হাঁটা বা জগিং',
-                'description'    => '৩০ মিনিট বাইরে হাঁটা বা জগিং করুন',
-                'scheduled_time' => '08:30:00',
-                'repeat_type'    => 'weekly',
-                'repeat_days'    => [2, 6], // মঙ্গলবার ও শনিবার
-                'active_from_day'=> 0,
-                'active_until_day'=> null,
-                'sort_order'     => 3,
-                'is_active'      => true,
-            ],
-            [
-                'category'       => 'exercise',
-                'title'          => 'শক্তি বৃদ্ধি — বডিওয়েট',
-                'description'    => 'Push-up, Squat, Plank, Jumping Jack — ৩০ মিনিট',
-                'scheduled_time' => '08:30:00',
-                'repeat_type'    => 'weekly',
-                'repeat_days'    => [0, 3], // রবিবার ও বুধবার
-                'active_from_day'=> 0,
-                'active_until_day'=> null,
-                'sort_order'     => 3,
-                'is_active'      => true,
-            ],
-            [
-                'category'       => 'exercise',
-                'title'          => 'স্ট্রেচিং ও বিশ্রাম',
-                'description'    => '২০ মিনিট হালকা স্ট্রেচিং ও ৫ মিনিট গভীর শ্বাস',
-                'scheduled_time' => '08:30:00',
-                'repeat_type'    => 'weekly',
-                'repeat_days'    => [1, 4], // সোমবার ও বৃহস্পতিবার
+                'title'          => 'আজ কতটি পুশ আপ দিয়েছেন?',
+                'description'    => 'আজকের পুশ আপ কাউন্ট লিখুন। ধীরে ধীরে এটা বাড়াতে হবে।',
+                'scheduled_time' => '10:30:00',
+                'repeat_type'    => 'daily',
                 'active_from_day'=> 0,
                 'active_until_day'=> null,
                 'sort_order'     => 3,
@@ -156,7 +115,7 @@ class TaskDefinitionSeeder extends Seeder
             [
                 'category'       => 'medicine',
                 'title'          => 'TB ওষুধ খান',
-                'description'    => 'TB ওষুধ খালি পেটে খান',
+                'description'    => 'প্রতিদিন সকালে টিবি ওষুধ খালি পেটে খান',
                 'scheduled_time' => '08:00:00',
                 'repeat_type'    => 'daily',
                 'repeat_days'    => null,
@@ -180,7 +139,7 @@ class TaskDefinitionSeeder extends Seeder
             [
                 'category'       => 'medicine',
                 'title'          => 'Extra DTG ওষুধ নিন',
-                'description'    => 'Extra DTG — প্রতিদিন রাত ৮টায়',
+                'description'    => 'Extra DTG — প্রতিদিন সকাল ১০টায়',
                 'scheduled_time' => '10:00:00',
                 'repeat_type'    => 'daily',
                 'repeat_days'    => null,
@@ -263,6 +222,18 @@ class TaskDefinitionSeeder extends Seeder
                 'active_until_day'=> null,
                 'sort_order'      => 6,
                 'is_active'       => true,
+            ],
+            [
+                'category' => 'smoking',
+                'title' => 'এক্সট্রা সিগারেট',
+                'description' => 'প্ল্যানের বাইরে অতিরিক্ত সিগারেট',
+                'scheduled_time' => null,
+                'active_from_day' => 1,
+                'active_until_day' => null,
+                'repeat_type' => 'daily',
+                'repeat_days' => null,
+                'sort_order' => 999,
+                'is_active' => true,
             ],
         ];
 

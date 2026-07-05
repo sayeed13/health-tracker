@@ -7,50 +7,43 @@
         </p>
     </div>
 
-    @php
-        $dayName = \Carbon\Carbon::now('Asia/Colombo')->locale('bn')->isoFormat('dddd');
-        $weekday = \Carbon\Carbon::now('Asia/Colombo')->dayOfWeek;
-        $types   = [
-            0 => ['type' => 'শক্তি বৃদ্ধি',   'color' => 'purple'],
-            1 => ['type' => 'স্ট্রেচিং',       'color' => 'blue'],
-            2 => ['type' => 'কার্ডিও',         'color' => 'emerald'],
-            3 => ['type' => 'স্ট্রেচিং',       'color' => 'blue'],
-            4 => ['type' => 'শক্তি বৃদ্ধি',   'color' => 'purple'],
-            5 => ['type' => 'বিশ্রাম',         'color' => 'gray'],
-            6 => ['type' => 'কার্ডিও',         'color' => 'emerald'],
-        ];
-        $todayType = $types[$weekday];
-    @endphp
-
-    {{-- আজকের ধরন --}}
-    <div class="bg-{{ $todayType['color'] }}-500/10 border border-{{ $todayType['color'] }}-500/20
-                rounded-xl p-3 mb-4 flex items-center gap-3">
-        <div class="w-10 h-10 bg-{{ $todayType['color'] }}-500/20 rounded-xl
-                    flex items-center justify-center">
-            <svg class="w-5 h-5 text-{{ $todayType['color'] }}-400"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                    d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
-        </div>
-        <div>
-            <p class="text-sm font-semibold text-white">আজকের ধরন: {{ $todayType['type'] }}</p>
-            <p class="text-xs text-gray-500">সকাল ৮:৩০ — ৩০ মিনিট</p>
-        </div>
+    <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-4">
+        <p class="text-sm text-blue-300 font-medium">আজ কতটি Push-up করেছেন?</p>
+        <p class="text-xs text-gray-500 mt-1">যতটা করেছেন, সংখ্যাটা লিখে সেভ করুন</p>
     </div>
 
-    <x-task-list
-        :tasks="$tasks"
-        :logs="$logs"
-        route="exercise"
-    />
+    <form method="POST" action="{{ route('exercise.save') }}" class="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-4">
+        @csrf
 
-    @if($tasks->isEmpty())
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
-            <p class="text-2xl mb-2">😴</p>
-            <p class="text-gray-400 text-sm font-medium">আজকে বিশ্রামের দিন</p>
-            <p class="text-gray-600 text-xs mt-1">শুক্রবার সম্পূর্ণ বিশ্রাম নিন</p>
+        <div>
+            <label for="pushup_count" class="block text-sm font-medium text-white mb-2">
+                Push-up Count
+            </label>
+            <input
+                id="pushup_count"
+                type="number"
+                name="pushup_count"
+                min="0"
+                step="1"
+                value="{{ old('pushup_count', $pushupCount) }}"
+                class="w-full rounded-xl bg-gray-950 border border-gray-700 text-white px-4 py-3"
+                placeholder="যেমন 10 / 20 / 30"
+            >
+            @error('pushup_count')
+                <p class="text-xs text-red-400 mt-2">{{ $message }}</p>
+            @enderror
         </div>
-    @endif
+
+        <button type="submit" class="w-full rounded-xl bg-blue-600 hover:bg-blue-500 text-white py-3 text-sm font-medium transition">
+            সেভ করুন
+        </button>
+    </form>
+
+    <div class="grid grid-cols-1 gap-3 mt-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-blue-400">{{ $pushupCount }}</div>
+            <div class="text-xs text-gray-500 mt-1">আজকের মোট Push-up</div>
+        </div>
+    </div>
 
 </x-app-layout>

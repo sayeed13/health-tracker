@@ -14,12 +14,15 @@ class DailyLog extends Model
         'is_completed',
         'completed_at',
         'notes',
+        'quantity',
+        'unit',
     ];
 
     protected $casts = [
         'log_date' => 'date',
         'is_completed' => 'boolean',
         'completed_at' => 'datetime',
+        'quantity' => 'integer',
     ];
 
     public function user(): BelongsTo

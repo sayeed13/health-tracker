@@ -76,46 +76,26 @@ class MonthlyController
         $data = [];
 
         if ($filter === 'week') {
-            // সপ্তাহের ৭ দিনের ডাটা
             for ($i = 0; $i < 7; $i++) {
                 $date = Carbon::parse($start, $user->timezone)->addDays($i)->toDateString();
-                $count = DailyLog::where('user_id', $user->id)
-                    ->where('log_date', $date)
-                    ->where('is_completed', true)
-                    ->whereHas('taskDefinition', fn($q) => $q->where('category', $category))
-                    ->count();
-                $data[] = $count;
+                $data[] = $this->getMetricValueForDate($category, $date, $user);
             }
-
         } elseif ($filter === 'month') {
-            // মাসের প্রতিদিনের ডাটা
             $startCarbon = Carbon::parse($start, $user->timezone);
             $daysInMonth = $startCarbon->daysInMonth;
 
             for ($day = 1; $day <= $daysInMonth; $day++) {
                 $date = $startCarbon->copy()->setDay($day)->toDateString();
-                $count = DailyLog::where('user_id', $user->id)
-                    ->where('log_date', $date)
-                    ->where('is_completed', true)
-                    ->whereHas('taskDefinition', fn($q) => $q->where('category', $category))
-                    ->count();
-                $data[] = $count;
+                $data[] = $this->getMetricValueForDate($category, $date, $user);
             }
+        } else {
+            $year = Carbon::parse($start)->year;
 
-        } else { // year
-            // বছরের ১২ মাসের মোট ডাটা
             for ($m = 1; $m <= 12; $m++) {
-                $monthStart = Carbon::create($user->timezone)->setYear(Carbon::parse($start)->year)
-                    ->setMonth($m)->startOfMonth()->toDateString();
-                $monthEnd   = Carbon::create($user->timezone)->setYear(Carbon::parse($start)->year)
-                    ->setMonth($m)->endOfMonth()->toDateString();
+                $monthStart = Carbon::create($year, $m, 1, 0, 0, 0, $user->timezone)->startOfMonth()->toDateString();
+                $monthEnd   = Carbon::create($year, $m, 1, 0, 0, 0, $user->timezone)->endOfMonth()->toDateString();
 
-                $count = DailyLog::where('user_id', $user->id)
-                    ->whereBetween('log_date', [$monthStart, $monthEnd])
-                    ->where('is_completed', true)
-                    ->whereHas('taskDefinition', fn($q) => $q->where('category', $category))
-                    ->count();
-                $data[] = $count;
+                $data[] = $this->getMetricValueForRange($category, $monthStart, $monthEnd, $user);
             }
         }
 
@@ -124,6 +104,63 @@ class MonthlyController
             'data'  => $data,
             'color' => $this->getCategoryColor($category),
         ];
+    }
+
+    private function getMetricValueForDate(string $category, string $date, $user): int
+    {
+        return match ($category) {
+            'exercise' => $this->getExerciseValueForRange($date, $date, $user),
+            'smoking'  => $this->getSmokingValueForRange($date, $date, $user),
+            default    => $this->getDefaultCompletedCountForRange($category, $date, $date, $user),
+        };
+    }
+
+    private function getMetricValueForRange(string $category, string $startDate, string $endDate, $user): int
+    {
+        return match ($category) {
+            'exercise' => $this->getExerciseValueForRange($startDate, $endDate, $user),
+            'smoking'  => $this->getSmokingValueForRange($startDate, $endDate, $user),
+            default    => $this->getDefaultCompletedCountForRange($category, $startDate, $endDate, $user),
+        };
+    }
+
+    private function getExerciseValueForRange(string $startDate, string $endDate, $user): int
+    {
+        return (int) DailyLog::where('user_id', $user->id)
+            ->whereBetween('log_date', [$startDate, $endDate])
+            ->whereHas('taskDefinition', fn($q) => $q->where('category', 'exercise'))
+            ->sum('quantity');
+    }
+
+    private function getSmokingValueForRange(string $startDate, string $endDate, $user): int
+    {
+        $plannedSmoked = DailyLog::where('user_id', $user->id)
+            ->whereBetween('log_date', [$startDate, $endDate])
+            ->where('is_completed', true)
+            ->whereHas('taskDefinition', fn($q) =>
+                $q->where('category', 'smoking')
+                ->where('title', '!=', 'এক্সট্রা সিগারেট')
+            )
+            ->count();
+
+        $extraSmoked = DailyLog::where('user_id', $user->id)
+            ->whereBetween('log_date', [$startDate, $endDate])
+            ->whereHas('taskDefinition', fn($q) =>
+                $q->where('category', 'smoking')
+                ->where('title', 'এক্সট্রা সিগারেট')
+            )
+            ->sum('quantity');
+
+        return (int) ($plannedSmoked + $extraSmoked);
+    }
+
+    private function getDefaultCompletedCountForRange(string $category, string $startDate, string $endDate, $user): int
+    {
+        return (int) DailyLog::where('user_id', $user->id)
+            ->whereBetween('log_date', [$startDate, $endDate])
+            ->where('is_completed', true)
+            ->whereHas('taskDefinition', fn($q) => $q->where('category', $category))
+            ->count();
     }
 
     private function getCategoryLabel(string $category): string
